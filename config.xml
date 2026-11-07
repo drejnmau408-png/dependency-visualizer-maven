@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <package_name>spring-core</package_name>
+    <repository_url>test_repo.txt</repository_url>
+    <test_mode>true</test_mode>
+    <package_version>5.3.20</package_version>
+    <output_image_file>graph.svg</output_image_file>
+    <ascii_tree>true</ascii_tree>
+    <filter_substring>zzz</filter_substring>
+</config>

@@ -1,0 +1,11 @@
+Package: spring-core
+Version: 5.3.20
+Depends: spring-jcl
+
+Package: spring-jcl
+Version: 5.3.20
+Depends: 
+
+Package: spring-beans
+Version: 5.3.20
+Depends: spring-core
