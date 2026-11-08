@@ -49,6 +49,22 @@ def parse_packages(text):
             packages[name] = {"version": ver, "depends": deps}
     return packages
 
+def build_graph_iterative(packages, target, filter_substring):
+    graph = {}
+    stack = [target]
+    visited = set()
+    while stack:
+        current = stack.pop()
+        if current in visited: continue
+        visited.add(current)
+        if current not in packages: continue
+        deps = packages[current]["depends"]
+        filtered = [d for d in deps if not (filter_substring and filter_substring in d)]
+        graph[current] = filtered
+        for d in filtered:
+            if d not in visited: stack.append(d)
+    return graph
+
 def main():
     config = load_config()
     print("Параметры конфигурации:")
@@ -60,6 +76,10 @@ def main():
     if target not in packages:
         print(f"Ошибка: пакет {target} не найден."); sys.exit(1)
     print(f"Прямые зависимости {target}: {packages[target]['depends']}")
+    
+    print("\n--- Этап 3: Граф (DFS без рекурсии) ---")
+    graph = build_graph_iterative(packages, target, config["filter_substring"])
+    for k, v in graph.items(): print(f"  {k} -> {v}")
 
 if __name__ == "__main__":
     main()
