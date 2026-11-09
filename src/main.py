@@ -65,6 +65,21 @@ def build_graph_iterative(packages, target, filter_substring):
             if d not in visited: stack.append(d)
     return graph
 
+def find_reverse_deps(packages, target, filter_substring):
+    rev_graph = {}
+    for pkg, data in packages.items():
+        for dep in data["depends"]:
+            if filter_substring and filter_substring in dep: continue
+            rev_graph.setdefault(dep, []).append(pkg)
+    result, stack, visited = set(), [target], set()
+    while stack:
+        node = stack.pop()
+        if node in visited: continue
+        visited.add(node)
+        for parent in rev_graph.get(node, []):
+            result.add(parent); stack.append(parent)
+    return sorted(result)
+
 def main():
     config = load_config()
     print("Параметры конфигурации:")
@@ -80,6 +95,10 @@ def main():
     print("\n--- Этап 3: Граф (DFS без рекурсии) ---")
     graph = build_graph_iterative(packages, target, config["filter_substring"])
     for k, v in graph.items(): print(f"  {k} -> {v}")
+    
+    print("\n--- Этап 4: Обратные зависимости ---")
+    rev = find_reverse_deps(packages, target, config["filter_substring"])
+    print(f"Зависят от {target}: {rev if rev else 'нет'}")
 
 if __name__ == "__main__":
     main()
