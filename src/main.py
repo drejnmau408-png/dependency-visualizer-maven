@@ -169,17 +169,17 @@ def main():
         print(f"Error: package {target} not found.")
         sys.exit(1)
     
-    print(f"Direct dependencies of {target}: {packages[target]['depends']}")
+    print(f"Direct dependencies of {target}: {packages[target]['depends']}") #вывод прямых зависимостей
     
-    print("\n--- Dependency graph (DFS with recursion) ---")
+    print("\n--- Dependency graph (DFS with recursion) ---") #посроение этап 3
     graph = build_graph_recursive(packages, target, config["filter_substring"])
     for k, v in graph.items(): print(f"  {k} -> {v}")
     
-    print("\n--- Reverse dependencies ---")
+    print("\n--- Reverse dependencies ---") #Этап 4 вывод обратные зависимости
     rev = find_reverse_deps(packages, target, config["filter_substring"])
     print(f"Packages depending on {target}: {rev if rev else 'none'}")
     
-    print("\n--- Visualization ---")
+    print("\n--- Visualization ---") #этап 5 визуализация
     dot = generate_graphviz(graph, config["output_image_file"])
     print(f"Graphviz code (saved to {config['output_image_file']}.dot):")
     print(dot)
