@@ -138,7 +138,7 @@ def generate_graphviz(graph, filename):
         f.write(dot_code)
     return dot_code
 
-# ???????? ??????? ?? ASCII
+#ASCII
 def print_ascii_tree(packages, pkg, filter_substr, prefix="", is_last=True, visited=None):
     if visited is None: visited = set() #создаем множество пакетов
     if pkg in visited: #встречался ли пакет ранее
