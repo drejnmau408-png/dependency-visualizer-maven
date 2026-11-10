@@ -13,7 +13,7 @@ EXPECTED_TYPES = {
     "filter_substring": str,
 }
 
-def load_config(path="config.ini"):
+def load_config(path="config.ini"): #этап один загружает и проверяет настройки
     if not os.path.exists(path):
         print(f"Error: config file {path} not found.")
         sys.exit(1)
@@ -50,7 +50,7 @@ def load_config(path="config.ini"):
     
     return result
 
-def get_packages_data(config):
+def get_packages_data(config): #этап 2 получает данные из тестовой мавен
     url = config["repository_url"]
     if config["test_mode"]:
         if not os.path.exists(url):
@@ -67,7 +67,7 @@ def get_packages_data(config):
             print(f"Error downloading: {e}")
             sys.exit(1)
 
-def parse_packages(packages_text):
+def parse_packages(packages_text): #извлекает пакеты версии и зависимости
     packages = {}
     blocks = packages_text.strip().split("\n\n")
     for block in blocks:
@@ -88,7 +88,7 @@ def parse_packages(packages_text):
             packages[pkg_name] = {"version": pkg_version, "depends": deps}
     return packages
 
-def build_graph_recursive(packages, target, filter_substring, visited=None, graph=None):
+def build_graph_recursive(packages, target, filter_substring, visited=None, graph=None): #этап 4 строит граф ищет обратные зависимости
     if visited is None:
         visited = set()
     if graph is None:
