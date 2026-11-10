@@ -98,7 +98,7 @@ make clean
 
 ## 4. Примеры использования
 
-### 4.1. Тестовый режим (рекомендуется для демонстрации)
+### 4.1. Тестовый режим
 
 Файл `config.ini` уже настроен на тестовый репозиторий:
 
@@ -123,36 +123,8 @@ make run
 - Обнаружение цикла (через `E → B`)
 - Обратные зависимости
 - Graphviz DOT-описание
-- ASCII-дерево
-
-### 4.2. Реальный Maven-репозиторий
-
-Скопируйте пример:
-
-```bash
-cp examples/sample_config.ini config.ini
-```
-
-Содержимое:
-
-```ini
-[settings]
-package_name = org.springframework:spring-core
-repo_url = https://repo1.maven.org/maven2
-test_mode = false
-package_version = 5.3.21
-ascii_tree = false
-```
-
-Затем:
-
-```bash
-make run
-```
-
-Программа скачает POM-файл и выведет прямые зависимости.
-
-### 4.3. Формат тестового файла репозитория
+- ASCII-дерево 
+### 4.2. Формат тестового файла репозитория
 
 ```
 A -> B C
