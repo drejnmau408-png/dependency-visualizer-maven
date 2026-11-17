@@ -1,0 +1,8 @@
+digraph dependencies {
+    rankdir=LR;
+    "spring-core" -> "spring-jcl";
+    "spring-core" -> "spring-beans";
+    "spring-jcl" -> "commons-logging";
+    "commons-logging";
+    "spring-beans";
+}
