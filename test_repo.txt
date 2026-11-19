@@ -1,15 +1,15 @@
-Package: spring-core
-Version: 5.3.20
-Depends: spring-jcl, spring-beans
+Package: A
+Version: 5.3.21
+Depends: B,C
 
-Package: spring-jcl
-Version: 5.3.20
-Depends: commons-logging
+Package: B
+Version: 5.3.21
+Depends: D
 
-Package: commons-logging
+Package: C
+Version: 5.3.21
+Depends:
+
+Package: D
 Version: 1.2
-Depends: 
-
-Package: spring-beans
-Version: 5.3.20
-Depends: 
+Depends:
