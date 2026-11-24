@@ -24,13 +24,12 @@ EXPECTED_TYPES = {
 
 # ЭТАП 1: загрузка конфигурации
 
-
 def load_config(path="config.ini"):
     """
-    Читает config.ini и проверяет, что все нужные параметры есть.
-    Это этап 1 — работа с конфигурационным файлом.
+    читает config.ini и проверяет что все нужные параметры есть
     """
-    # Ищем config.ini рядом со скриптом, если в текущей папке нет
+    # существут ли файл 
+    #если нет ищем рядом со скриптом
     if not os.path.exists(path):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         alt = os.path.join(script_dir, "..", "config.ini")
@@ -51,7 +50,7 @@ def load_config(path="config.ini"):
     if "settings" not in config:
         print("Error: missing [settings] section.")
         sys.exit(1)
-
+#создаем словарь и перебираем все парамеиры
     result = {}
     for key, expected in EXPECTED_TYPES.items():
         if not config.has_option("settings", key):
@@ -71,15 +70,16 @@ def load_config(path="config.ini"):
     return result
 
 
-# Тестовый режим: разбор локального файла test_repo.txt
+#  разбор локального файла test_repo.txt
 
 
 def parse_test_repo(text):
     """
-    Парсит тестовый репозиторий (формат Package / Version / Depends).
-    Используется только при test_mode = true.
+    парсит тестовый репозиторий формат Package  Version  Depends
+    используется только при test_mode = true.
     """
     packages = {}
+    #записываем пакеты
     blocks = text.strip().split("\n\n")
     for block in blocks:
         lines = block.strip().split("\n")
@@ -105,12 +105,12 @@ def parse_test_repo(text):
 
 
 
-# Реальный Maven: скачивание и разбор POM
+#  Maven: скачивание и разбор POM
 
 def maven_coords_to_path(group_id, artifact_id, version):
     """
-    Превращает groupId:artifactId:version в путь к POM в репозитории.
-    Пример: org.springframework / spring-core / 5.3.21 / ...
+    превращает groupId:artifactId:version в путь к POM в репозитории
+    org.springframework / spring-core / 5.3.21 / ...
     """
     group_path = group_id.replace(".", "/")
     return f"{group_path}/{artifact_id}/{version}/{artifact_id}-{version}.pom"
@@ -126,6 +126,7 @@ def fetch_pom(repo_base, group_id, artifact_id, version):
     try:
         with urllib.request.urlopen(url, timeout=15) as resp:
             return resp.read().decode("utf-8")
+    #обпаботка ошибок
     except HTTPError as e:
         print(f"  [warn] HTTP {e.code} for {group_id}:{artifact_id}:{version}")
         return None
@@ -139,8 +140,8 @@ def fetch_pom(repo_base, group_id, artifact_id, version):
 
 def parse_pom_dependencies(pom_text):
     """
-    Разбирает XML POM и достаёт прямые зависимости.
-    Берём только compile/runtime (test/provided/system пропускаем).
+    разбирает XML POM и достаёт прямые зависимости.
+    берм только compile/runtime 
     """
     deps = []
     try:
@@ -184,8 +185,8 @@ def parse_pom_dependencies(pom_text):
 
 def resolve_maven_graph(repo_url, root_group, root_artifact, root_version, filter_sub, max_depth=6):
     """
-    Строит транзитивный граф, скачивая реальные POM (DFS).
-    Это основная логика для test_mode = false.
+    строит граф скачивая реальные POM (DFS).
+    это основная логика для test_mode = false.
     """
     packages = {}  # ключ: "groupId:artifactId"
     visited = set()
@@ -212,7 +213,7 @@ def resolve_maven_graph(repo_url, root_group, root_artifact, root_version, filte
             if v:
                 dfs(g, a, v, depth + 1)
             else:
-                # версия не указана в POM — просто запоминаем узел
+                # версия не указана в POM просто запоминаем узел
                 if dep_key not in packages:
                     packages[dep_key] = {"version": "?", "depends": []}
 
@@ -233,9 +234,9 @@ def parse_package_name(name):
 
 def get_packages_data(config):
     """
-    ЭТАП 2 (часть): получение данных о пакетах.
-    test_mode=true  -> читаем test_repo.txt
-    test_mode=false -> качаем POM с Maven-репозитория
+    получение данных о пакетах.
+    test_mode=true  читаем test_repo.txt
+    test_mode=false  качаем POM с Maven-репозитория
     """
     if config["test_mode"]:
         path = config["repository_url"]
@@ -258,7 +259,7 @@ def get_packages_data(config):
 
 
 
-# ЭТАП 3: построение транзитивного графа (DFS)
+#построение транзитивного графа (DFS)
 
 
 def build_graph(packages, target, filter_sub, visited=None, graph=None):
