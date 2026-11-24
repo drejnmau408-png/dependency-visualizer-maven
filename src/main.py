@@ -6,10 +6,10 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from urllib.error import URLError, HTTPError
 
-# Namespace для XML POM-файлов Maven
+#  для XML POM-файлов Maven
 NS = {"m": "http://maven.apache.org/POM/4.0.0"}
 
-# Какие параметры обязательны в config.ini и какого они типа
+# какие параметры обязательны в config.ini и какого они типа
 EXPECTED_TYPES = {
     "package_name": str,
     "repository_url": str,
@@ -22,12 +22,10 @@ EXPECTED_TYPES = {
 
 
 
-# ЭТАП 1: загрузка конфигурации
+# 1: загрузка конфигурации
 
 def load_config(path="config.ini"):
-    """
-    читает config.ini и проверяет что все нужные параметры есть
-    """
+    #читает config.ini и проверяет что все нужные параметры есть
     # существут ли файл 
     #если нет ищем рядом со скриптом
     if not os.path.exists(path):
@@ -74,10 +72,8 @@ def load_config(path="config.ini"):
 
 
 def parse_test_repo(text):
-    """
-    парсит тестовый репозиторий формат Package  Version  Depends
-    используется только при test_mode = true.
-    """
+    #парсит тестовый репозиторий формат Package  Version  Depends
+    #используется только при test_mode = true.
     packages = {}
     #записываем пакеты
     blocks = text.strip().split("\n\n")
@@ -108,19 +104,18 @@ def parse_test_repo(text):
 #  Maven: скачивание и разбор POM
 
 def maven_coords_to_path(group_id, artifact_id, version):
-    """
-    превращает groupId:artifactId:version в путь к POM в репозитории
-    org.springframework / spring-core / 5.3.21 / ...
-    """
+
+    #превращает groupId:artifactId:version в путь к POM в репозитории
+    #org.springframework / spring-core / 5.3.21 / ...
+
     group_path = group_id.replace(".", "/")
     return f"{group_path}/{artifact_id}/{version}/{artifact_id}-{version}.pom"
 
 
 def fetch_pom(repo_base, group_id, artifact_id, version):
-    """
-    Скачивает POM-файл по HTTP с Maven-репозитория.
-    Менеджер пакетов (mvn) НЕ используется — только urllib.
-    """
+
+    #cкачивает POM-файл по HTTP с Maven-репозитория.
+    #менеджер пакетов (mvn) НЕ используется только urllib.
     path = maven_coords_to_path(group_id, artifact_id, version)
     url = repo_base.rstrip("/") + "/" + path
     try:
@@ -139,17 +134,16 @@ def fetch_pom(repo_base, group_id, artifact_id, version):
 
 
 def parse_pom_dependencies(pom_text):
-    """
-    разбирает XML POM и достаёт прямые зависимости.
-    берм только compile/runtime 
-    """
+
+    #разбирает XML POM и достаёт прямые зависимости.
+    #берм только compile/runtime 
     deps = []
     try:
         root = ET.fromstring(pom_text)
     except ET.ParseError:
         return deps
 
-    # Пробуем разные варианты поиска тегов (с namespace и без)
+    #  разные варианты поиска тегов (с namespace и без)
     dep_elements = root.findall(".//m:dependencies/m:dependency", NS)
     if not dep_elements:
         dep_elements = root.findall(
@@ -184,10 +178,9 @@ def parse_pom_dependencies(pom_text):
 
 
 def resolve_maven_graph(repo_url, root_group, root_artifact, root_version, filter_sub, max_depth=6):
-    """
-    строит граф скачивая реальные POM (DFS).
-    это основная логика для test_mode = false.
-    """
+
+    #строит граф скачивая реальные POM (DFS).
+    #это основная логика для test_mode = false.
     packages = {}  # ключ: "groupId:artifactId"
     visited = set()
 
@@ -263,10 +256,8 @@ def get_packages_data(config):
 
 
 def build_graph(packages, target, filter_sub, visited=None, graph=None):
-    """
-    Рекурсивный DFS: строим словарь {пакет: [его зависимости]}.
-    Учитываем filter_substring и избегаем повторного обхода (циклы).
-    """
+    # DFS: строим словарь {пакет: [его зависимости]}.
+    #Учитываем filter_substring и избегаем повторного обхода (циклы).
     if visited is None:
         visited = set()
     if graph is None:
@@ -290,7 +281,7 @@ def build_graph(packages, target, filter_sub, visited=None, graph=None):
 
 def find_reverse(packages, target, filter_sub):
    
-    # Строим обратный граф: dep -> [кто от него зависит]
+    # строим обратный граф: dep -> [кто от него зависит]
     rev_graph = {}
     for pkg, data in packages.items():
         for dep in data["depends"]:
@@ -358,7 +349,7 @@ def print_tree(packages, pkg, filter_sub, prefix="", is_last=True, visited=None)
 
 
 
-# main — запуск по этапам
+# main запуск по этапам
 def main():
     parser = argparse.ArgumentParser(
         description="Maven dependency graph visualizer (этапы 1–5)"
@@ -380,10 +371,10 @@ def main():
         if args.stage == 1:
             return
 
-    # Получаем словарь пакетов (тест или реальный Maven)
+    # получаем словарь пакетов (тест или реальный Maven)
     packages = get_packages_data(config)
 
-    # Целевой пакет
+    # целевой пакет
     if config["test_mode"]:
         target = config["package_name"]
     else:
